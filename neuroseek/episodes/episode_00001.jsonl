@@ -1,8 +1,8 @@
 {
   "metrics": {
-    "run_id": "run_00001",
-    "seed": 123456789,
-    "params_hash": "a3f4c9...",
+    "run_id": "run_000001",
+    "seed": 1729,
+    "params_hash": "a3f4c9e8b2d1a7f6",
     "mean_habit_load": 0.23,
     "max_habit_load": 0.91,
     "habit_load_gini": 0.42,
@@ -30,28 +30,28 @@
   },
   "reflections": {
     "line": {
-      "what": "...",
-      "so_what": "...",
-      "now_what": "..."
+      "what": "Mean habit load was 0.23, with a peak of 0.91 at site 42. Pollution inequality (Gini 0.36) indicates that exposure concentrated in downstream segments.",
+      "so_what": "The line moved away from Tree-of-Life stewardship: high-POWER sites emitted without matching repair deeds, and 37 consent breaches clustered in low-CHURCH zones, signaling unfair externalisation of harm.",
+      "now_what": "For future policy experiments, NeuroSeek will consider lowering emission caps for sites with POWER above a fair-use threshold and increasing CHURCH rewards for DeployCleanTech and other restorative deeds, subject to Neuromorph-GOD and Tree-of-Life invariants."
     },
     "clusters": [
       {
-        "what": "...",
-        "so_what": "...",
-        "now_what": "..."
+        "what": "Cluster C (sites 15–22) showed mean habit load 0.71, elevated support_access_inequality of 0.52, and was responsible for approximately 43% of total logged emissions.",
+        "so_what": "This cluster shifted harm onto downstream sites 23–30, and the system required 2 Neuromorph-GOD repair interventions, indicating a systemic fairness imbalance rather than localized error.",
+        "now_what": "Subsequent runs may test higher diffusion decay, stricter local emission parameters, and TECR-weighted costs on emissions from this cluster, to see whether bioload and inequality improve without violating safety constraints."
       }
     ],
     "sites": [
       {
-        "what": "...",
-        "so_what": "...",
-        "now_what": "..."
+        "what": "Site 42 had habit_load 0.91, exposure_dose 0.88, 7 consent_breaches, and zero recorded UseSupport deeds in this Episode.",
+        "so_what": "Despite high FEAR and high bioload contribution to neighbors, no healing or repair deeds were taken here; this pattern conflicts with the Tree-of-Life principle that no site should sustain persistent harm to self or others without a path to repair.",
+        "now_what": "In future scenarios, policy sets under review will treat sites like 42 as candidates for earlier, consent-respecting FEAR-triggered access to UseSupport and restorative deeds once habit_load passes a documented threshold, while keeping actuation under human and governance control."
       }
     ],
     "forgiveness": {
-      "what_attempts": "...",
-      "so_what_evidence": "...",
-      "now_what_policy": "..."
+      "what_attempts": "Site 37 invoked UseSupport 3 times, reducing habit_load by about 0.4, and site 12 deployed CleanTech, reducing its local pollution stock by roughly 30% during the Episode.",
+      "so_what_evidence": "Global mean bioload decreased by approximately 8% after these deeds, and consent breaches at site 37 fell to zero, providing measurable evidence of partial redemption and restored stewardship.",
+      "now_what_policy": "Under NeuroSeek analysis, sites that demonstrate at least one redemptive trajectory and reduce their externalised harm by more than half may be treated in future policy designs as eligible for partial forgiveness labels in FEAR and consent views, while keeping all original breaches preserved in the immutable audit log."
     }
   }
 }
