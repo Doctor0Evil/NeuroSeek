@@ -1,0 +1,57 @@
+{
+  "metrics": {
+    "run_id": "run_00001",
+    "seed": 123456789,
+    "params_hash": "a3f4c9...",
+    "mean_habit_load": 0.23,
+    "max_habit_load": 0.91,
+    "habit_load_gini": 0.42,
+    "total_use_habit_deeds": 580,
+    "total_use_support_deeds": 120,
+    "mean_exposure_dose": 0.35,
+    "max_exposure_dose": 0.88,
+    "mean_bioload": 0.27,
+    "max_bioload": 0.93,
+    "collapse_events": 2,
+    "recovery_events": 5,
+    "consent_respected_events": 420,
+    "consent_breach_events": 37,
+    "addictionpull_events": 310,
+    "healingcure_events": 95,
+    "roh_neuro_mean": 0.41,
+    "hpcc_mean": 0.38,
+    "erg_mean": 0.44,
+    "tecr_mean": 0.59,
+    "pollution_inequality": 0.36,
+    "support_access_inequality": 0.18,
+    "habit_reduction_after_support": 0.27,
+    "bioload_reduction_after_repair": 0.21,
+    "redemptive_traj_count": 14
+  },
+  "reflections": {
+    "line": {
+      "what": "...",
+      "so_what": "...",
+      "now_what": "..."
+    },
+    "clusters": [
+      {
+        "what": "...",
+        "so_what": "...",
+        "now_what": "..."
+      }
+    ],
+    "sites": [
+      {
+        "what": "...",
+        "so_what": "...",
+        "now_what": "..."
+      }
+    ],
+    "forgiveness": {
+      "what_attempts": "...",
+      "so_what_evidence": "...",
+      "now_what_policy": "..."
+    }
+  }
+}
