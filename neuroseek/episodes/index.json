@@ -1,0 +1,19 @@
+/// Entry for the global episode index.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NeuroSeekEpisodeIndexEntry {
+    /// Must match the `run_id` in the episode file and the filename.
+    pub run_id: String,
+    /// When the simulation finished.
+    pub timestamp: DateTime<Utc>,
+    /// Seed used for reproducibility.
+    pub seed: u64,
+    /// Hash of parameters (same as in metrics).
+    pub params_hash: String,
+    /// Human‑readable description (e.g., "universal support, high emission tax").
+    pub description: Option<String>,
+    /// Relative path from repo root to the episode JSON file.
+    pub file_path: String,
+}
+
+/// The index is simply a list of entries, sorted by timestamp (newest first).
+pub type NeuroSeekEpisodeIndex = Vec<NeuroSeekEpisodeIndexEntry>;
