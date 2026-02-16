@@ -1,0 +1,32 @@
+{
+  "NanopolyObject": {
+    "ID": "0xNP_ECOMAT_SOILREGEN_V2",
+    "Composition": {
+      "Matrix": "Starch-chitosan (70:30) crosslinked with citric acid",
+      "Fillers": "Wood ash (5%), nano-cellulose (2%)",
+      "NutrientSystem": "TPS/ENR 60:40 with 6.9% UrCaSO cocrystal",
+      "Electronics": "Mg₂Si semiconductor, Mg conductors, silk encapsulation",
+      "MicrobiomeModulator": "PBAT (<0.1% effective soil concentration)"
+    },
+    "DeploymentKinetics": {
+      "SensorFunctionLife": "30–90 days (tunable via silk thickness)",
+      "InitialNutrientBoost": "0–30 days (TPS phase)",
+      "SustainedRelease": "30–120 days (ENR phase)",
+      "CarbonScaffolding": "110+ days (starch-chitosan residue)",
+      "CompleteDissolution": "<180 days"
+    },
+    "EcologicalBenefits": {
+      "WaterHoldingCapacity": "+200–420% during swelling phase",
+      "NitrogenUseEfficiency": "Leaching reduced ~40% vs. conventional",
+      "MicrobialNetworkComplexity": "+20–35% nodes/edges at optimal dose",
+      "SoilAggregation": "Improved via humus-like carbon fragments",
+      "NutrientDelivery": "Ca²⁺, Mg²⁺, K⁺ from wood ash; N from UrCaSO"
+    },
+    "SafetyVerification": {
+      "CopperContent": "0% (excluded per [citation:7])",
+      "MicroplasticRisk": "Negligible (complete biodegradation confirmed)",
+      "Phytotoxicity": "None at 6.9% loading [citation:5]",
+      "Biocompatibility": "Validated per ISO 10993 standards [citation:3]"
+    }
+  }
+}
