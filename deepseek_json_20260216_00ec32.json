@@ -1,0 +1,35 @@
+{
+  "SoilReturnProfile": {
+    "MaterialID": "StarchComposite_EcoMAT_v1",
+    "TargetEcosystem": "Temperate Agricultural Soil",
+    "DecompositionKinetics": {
+      "HalfLife": "45-60 days", // Total functional life ~90 days
+      "DegradationRate": "72% in 120 days (laboratory conditions)", // Based on [citation:1][citation:5]
+      "DegradationModel": "First-order kinetics with temperature/moisture modifiers",
+      "FinalProducts": ["Carbon-rich fragments", "Bound Ca/Mg/K ions", "CO2", "H2O"]
+    },
+    "BiophysicalTargets": {
+      "CarbonScaffolding": {
+        "ElasticModulusTarget": "Similar to native soil humus (2-5 MPa)",
+        "HydrophobicityTarget": "Mixed wettability, contact angle 60-80°",
+        "Goal": "Improve soil aggregation and water-holding capacity"
+      },
+      "NutrientBuffering": {
+        "IonReleaseCurves": "Slow, sustained release of Ca²⁺, Mg²⁺, K⁺ over 90 days",
+        "PeakSalinityRisk": "Low (electrical conductivity < 2 dS/m)",
+        "Goal": "Prevent nutrient spikes, provide long-term fertility"
+      },
+      "MicrobiomeSupport": {
+        "BioAffinityTarget": ["Arbuscular mycorrhizal fungi", "Nitrogen-fixing bacteria (e.g., Rhizobia)"],
+        "LifeforceIndexGoal": "+15% to +25% in 90 days", // Relative to control soil
+        "Mechanism": "Provide slow-release carbon substrates that stimulate beneficial microbial activity [citation:1][citation:5]"
+      }
+    },
+    "SafetyConstraints": {
+      "RoH_soil": "≤ 0.3", // Rigorous safety threshold
+      "EcoImpactScoreTrajectory": "Monotonically decreasing to < 0.1 after 120 days",
+      "ThermalDistanceIndexTrajectory": "Decrease to < 0.2 after 120 days",
+      "RequiredPreCertification": "Pass lab soil-column tests (ASTM D5988-18 or equivalent)"
+    }
+  }
+}
