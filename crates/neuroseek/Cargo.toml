@@ -17,6 +17,8 @@ reqwest = { version = "0.11", features = ["json"] }
 urlencoding = "2.0"
 nalgebra = "0.32"
 thiserror = "1.0"
+prometheus = { version = "0.13", optional = true } # if we use it in governance
+lazy_static = "1.4"
 
 # Path dependency to our new audio crate
 neuroseek_audio = { path = "../neuroseek_audio" }
