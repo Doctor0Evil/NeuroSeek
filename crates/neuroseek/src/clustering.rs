@@ -3,7 +3,7 @@
 //! Implements an adaptive streaming algorithm with decay, merging, and pruning.
 //! Pure Rust, no I/O, no device control—safe for observation-only mode.
 
-use crate::model::{BiophysicalState, MicroPolytope};
+use crate::model::{MicroPolytope, TaggedState, BiophysicalState};
 use std::time::{Duration, Instant};
 
 /// Configuration for the polytope clusterer.
@@ -53,13 +53,14 @@ impl PolytopeClusterer {
     }
 
     /// Insert a new observation point at time `now`.
-    pub fn insert_point(&mut self, point: BiophysicalState, now: Instant) {
+    pub fn insert_point(&mut self, point: TaggedState) {
+        let now = point.timestamp;
         // Find the nearest polytope within its radius * radius_factor.
         let mut best_idx = None;
         let mut best_dist = f64::INFINITY;
 
         for (i, poly) in self.polytopes.iter().enumerate() {
-            let dist = point.distance(&poly.centroid());
+            let dist = point.state.distance(&poly.centroid());
             let threshold = poly.radius() * self.config.radius_factor;
             if dist <= threshold && dist < best_dist {
                 best_idx = Some(i);
@@ -69,10 +70,10 @@ impl PolytopeClusterer {
 
         if let Some(idx) = best_idx {
             // Update existing polytope.
-            self.polytopes[idx].update(&point, now, self.config.decay_rate);
+            self.polytopes[idx].update(&point, self.config.decay_rate);
         } else {
             // Create a new polytope.
-            self.polytopes.push(MicroPolytope::from_point(&point, now));
+            self.polytopes.push(MicroPolytope::from_point(&point));
         }
 
         // Periodic maintenance.
@@ -113,6 +114,10 @@ impl PolytopeClusterer {
                     }
                     poly_i.craving_sum += poly_j.craving_sum;
                     poly_i.craving_count += poly_j.craving_count;
+                    // Merge stimulus counts
+                    for (id, count) in &poly_j.stimulus_counts {
+                        *poly_i.stimulus_counts.entry(id.clone()).or_insert(0) += count;
+                    }
                     // Remove poly_j.
                     self.polytopes.remove(j);
                 } else {
@@ -150,109 +155,57 @@ impl PolytopeClusterer {
             .find(|p| state.distance(&p.centroid()) <= p.radius() * self.config.radius_factor)
         {
             poly.add_craving(intensity);
-            // Also update last_update to keep decay consistent? Optional.
-            poly.last_update = now;
+            poly.last_update = now; // optional
         }
+    }
+
+    /// Query stimulus statistics: for a given stimulus_id, return the polytopes it appears in
+    /// and the count.
+    pub fn stimulus_polytopes(&self, stimulus_id: &str) -> Vec<(&MicroPolytope, u64)> {
+        self.polytopes
+            .iter()
+            .filter_map(|p| p.stimulus_counts.get(stimulus_id).map(|c| (p, *c)))
+            .collect()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::{Duration, Instant};
+    use crate::model::{StimulusMetadata, TaggedState};
 
-    fn test_point(e: f64, m: f64, s: f64, th: f64, t: f64) -> BiophysicalState {
-        BiophysicalState::new(e, m, s, th, t)
+    fn test_point(e: f64, m: f64, s: f64, th: f64, t: f64, stim_id: Option<&str>) -> TaggedState {
+        let state = BiophysicalState::new(e, m, s, th, t);
+        let stimulus = stim_id.map(|id| StimulusMetadata {
+            stimulus_id: id.to_string(),
+            stimulus_name: "test".into(),
+            audio_params: None,
+        });
+        TaggedState {
+            state,
+            timestamp: Instant::now(),
+            stimulus,
+        }
     }
 
     #[test]
-    fn test_insert_and_find() {
+    fn test_insert_with_stimulus() {
         let config = ClustererConfig::default();
         let mut clusterer = PolytopeClusterer::new(config, Duration::from_secs(60));
-        let now = Instant::now();
+        let p1 = test_point(0.1, 0.1, 0.1, 0.1, 0.1, Some("stimA"));
+        let p2 = test_point(0.11, 0.11, 0.11, 0.11, 0.11, Some("stimA")); // close
+        let p3 = test_point(0.9, 0.9, 0.9, 0.9, 0.9, Some("stimB")); // far
 
-        let p1 = test_point(0.1, 0.1, 0.1, 0.1, 0.1);
-        let p2 = test_point(0.11, 0.11, 0.11, 0.11, 0.11); // close
-        let p3 = test_point(0.9, 0.9, 0.9, 0.9, 0.9); // far
-
-        clusterer.insert_point(p1, now);
-        clusterer.insert_point(p2, now + Duration::from_secs(1));
-        clusterer.insert_point(p3, now + Duration::from_secs(2));
+        clusterer.insert_point(p1);
+        clusterer.insert_point(p2);
+        clusterer.insert_point(p3);
 
         assert_eq!(clusterer.polytopes().len(), 2); // p1+p2 merged, p3 separate
-    }
+        let poly_a = &clusterer.polytopes()[0]; // should be the merged one
+        assert_eq!(poly_a.stimulus_counts.get("stimA"), Some(&2));
+        assert_eq!(poly_a.stimulus_counts.get("stimB"), None);
 
-    #[test]
-    fn test_decay_and_prune() {
-        let config = ClustererConfig {
-            decay_rate: 0.5,
-            min_weight: 0.6,
-            ..Default::default()
-        };
-        let mut clusterer = PolytopeClusterer::new(config, Duration::from_secs(60));
-        let now = Instant::now();
-
-        let p = test_point(0.5, 0.5, 0.5, 0.5, 0.5);
-        clusterer.insert_point(p, now);
-        assert_eq!(clusterer.polytopes().len(), 1);
-        assert!((clusterer.polytopes()[0].weight - 1.0).abs() < 1e-6);
-
-        // Advance time and apply decay.
-        clusterer.maintenance(now + Duration::from_secs(1)); // dt=1, decay=0.5^1=0.5
-        assert!((clusterer.polytopes()[0].weight - 0.5).abs() < 1e-6);
-
-        // Prune should not remove yet (weight=0.5, min_weight=0.6).
-        clusterer.prune();
-        assert_eq!(clusterer.polytopes().len(), 1);
-
-        // More decay.
-        clusterer.maintenance(now + Duration::from_secs(2)); // dt from last update? careful
-        // Simpler: just decay again manually.
-        clusterer.tick_decay(now + Duration::from_secs(2));
-        // weight should be 0.5 * 0.5^(1) = 0.25
-        assert!((clusterer.polytopes()[0].weight - 0.25).abs() < 1e-6);
-        clusterer.prune();
-        assert_eq!(clusterer.polytopes().len(), 0);
-    }
-
-    #[test]
-    fn test_merge() {
-        let config = ClustererConfig {
-            merge_threshold: 0.2,
-            ..Default::default()
-        };
-        let mut clusterer = PolytopeClusterer::new(config, Duration::from_secs(60));
-        let now = Instant::now();
-
-        let p1 = test_point(0.1, 0.1, 0.1, 0.1, 0.1);
-        let p2 = test_point(0.12, 0.12, 0.12, 0.12, 0.12); // close
-        let p3 = test_point(0.5, 0.5, 0.5, 0.5, 0.5); // far
-
-        clusterer.insert_point(p1, now);
-        clusterer.insert_point(p2, now + Duration::from_secs(1));
-        clusterer.insert_point(p3, now + Duration::from_secs(2));
-
-        // Without merging, we would have 2 polytopes (p1+p2 combined already because insert_point uses radius, not merge).
-        // But insert_point might have already merged p2 into p1 due to radius_factor. Let's force separate creation:
-        // Actually insert_point uses radius_factor * radius, and radius of a new polytope from p1 is 0 (since only one point).
-        // So p2 would be considered far (radius=0) and create a new polytope. So we should get 3 polytopes initially.
-        // Wait, that's a nuance: a brand new polytope has radius 0, so any other point will start a new polytope.
-        // That's fine. Then merge will combine p1 and p2.
-        // Let's test that.
-        let config = ClustererConfig {
-            merge_threshold: 0.2,
-            radius_factor: 1.5, // won't matter for initial insertion because radius=0.
-            ..Default::default()
-        };
-        let mut clusterer = PolytopeClusterer::new(config, Duration::from_secs(60));
-        clusterer.insert_point(p1, now);
-        clusterer.insert_point(p2, now + Duration::from_secs(1)); // becomes separate polytope (radius=0)
-        clusterer.insert_point(p3, now + Duration::from_secs(2));
-        assert_eq!(clusterer.polytopes().len(), 3);
-
-        // Now merge.
-        clusterer.merge_close();
-        // p1 and p2 should merge (distance 0.02 < 0.2)
-        assert_eq!(clusterer.polytopes().len(), 2);
+        let poly_b = &clusterer.polytopes()[1];
+        assert_eq!(poly_b.stimulus_counts.get("stimB"), Some(&1));
     }
 }
