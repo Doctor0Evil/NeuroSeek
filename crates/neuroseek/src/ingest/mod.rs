@@ -1,5 +1,5 @@
 //! Data ingestion from external metrics sources.
-//! Currently only provides a file‑based poller for demonstration.
-//! Extend with Prometheus or other sources as needed.
+//! Supports file‑based polling and direct Prometheus queries.
 
 pub mod episode_metrics;
+pub mod prometheus;
