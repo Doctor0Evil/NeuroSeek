@@ -189,3 +189,13 @@ mod tests {
         assert!(!poly.contains(&outside));
     }
 }
+
+impl AudioNanopolytope {
+    /// Compute the center if the polytope is axis-aligned (i.e., constraints are simple bounds).
+    /// Returns None if not axis-aligned.
+    pub fn center(&self) -> Option<AudioState> {
+        // This is a placeholder. In reality, you'd need to parse constraints to find bounds.
+        // For now, we return None.
+        None
+    }
+}
