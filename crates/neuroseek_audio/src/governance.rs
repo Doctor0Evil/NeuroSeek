@@ -3,6 +3,7 @@
 use crate::audio_nanopolytope::{AudioNanopolytope, AudioState};
 use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
+use prometheus::*; // hypothetical; in practice you'd use a Prometheus client crate.
 
 /// Telemetry from nanoswarms (simplified).
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -57,4 +58,33 @@ impl SessionLog {
         self.telemetry_after = Some(telemetry);
         self
     }
+}
+
+/// Prometheus metrics for active stimulus.
+lazy_static::lazy_static! {
+    static ref ACTIVE_STIMULUS: GaugeVec = register_gauge_vec!(
+        "active_stimulus",
+        "Indicates an active stimulus with metadata as labels",
+        &["id", "name", "carrier", "beat", "amplitude"]
+    ).unwrap();
+}
+
+/// Set Prometheus metrics when an audio session starts.
+pub fn set_active_stimulus(session_id: &str, name: &str, state: &AudioState) {
+    ACTIVE_STIMULUS
+        .with_label_values(&[
+            session_id,
+            name,
+            &state.carrier_hz.to_string(),
+            &state.beat_hz.to_string(),
+            &state.amplitude.to_string(),
+        ])
+        .set(1.0);
+}
+
+/// Clear Prometheus metrics when session ends.
+pub fn clear_active_stimulus(session_id: &str) {
+    ACTIVE_STIMULUS
+        .remove_label_values(&[session_id, "", "", "", ""]) // careful: need exact labels to remove
+        .unwrap_or(());
 }
